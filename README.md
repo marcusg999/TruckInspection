@@ -1,2 +1,0 @@
-# TruckInspection
-Truck Inspection App
