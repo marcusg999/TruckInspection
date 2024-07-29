@@ -625,10 +625,10 @@
     return doc;
 }
 
-    exportPdfBtn.addEventListener('click', async function() {
-    const doc = await generatePDF();
-    doc.save('box_truck_inspection_report.pdf');
-});
+    exportPdfBtn.addEventListener('click', function() {
+        const doc = generatePDF();
+        doc.save('box_truck_inspection_report.pdf');
+    });
 
     shareEmailBtn.addEventListener('click', function() {
         emailModal.style.display = "block";
