@@ -578,11 +578,12 @@
         // Add date
         doc.setFontSize(12);
         doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 25);
-        
+
+         doc.text('Inspection Reports', 105, 15, null, null, 'center');
         let yOffset = 35;
         
         // Add truck diagrams
-        ['front-view', 'passenger-side-view', 'driver-side-view', 'back-view'].forEach((view, index) => {
+        /*['front-view', 'passenger-side-view', 'driver-side-view', 'back-view'].forEach((view, index) => {
             const viewElement = document.getElementById(view);
             viewElement.style.display = 'block';
             
@@ -592,7 +593,7 @@
                 
                 yOffset += 90;
                 
-                if (index === 3) {
+                if (index === 3)*/ {
                     // Add damage reports
                     doc.addPage();
                     doc.setFontSize(16);
