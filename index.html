@@ -567,63 +567,68 @@
         document.getElementById('damage-location').value = '';
     }
 
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Box Truck Inspection Report', 105, 15, null, null, 'center');
+    
+    // Add date
+    doc.setFontSize(12);
+    doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 25);
+    
+    let yOffset = 35;
+    
+    // Add truck diagrams
+    const views = ['front-view', 'passenger-side-view', 'driver-side-view', 'back-view'];
+    
+    for (let i = 0; i < views.length; i++) {
+        const view = views[i];
+        const viewElement = document.getElementById(view);
+        viewElement.style.display = 'block';
         
-        // Add title
-        doc.setFontSize(18);
-        doc.text('Box Truck Inspection Report', 105, 15, null, null, 'center');
+        // Wait for the next frame to ensure the element is visible
+        await new Promise(resolve => requestAnimationFrame(resolve));
         
-        // Add date
-        doc.setFontSize(12);
-        doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 25);
+        const canvas = await html2canvas(viewElement);
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 20, yOffset, 170, 85);
         
-        let yOffset = 35;
+        yOffset += 90;
         
-        // Add truck diagrams
-        ['front-view', 'passenger-side-view', 'driver-side-view', 'back-view'].forEach((view, index) => {
-            const viewElement = document.getElementById(view);
-            viewElement.style.display = 'block';
+        viewElement.style.display = 'none';
+        
+        if (i === views.length - 1) {
+            // Add damage reports
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text('Inspection Reports', 105, 15, null, null, 'center');
             
-            html2canvas(viewElement).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                doc.addImage(imgData, 'PNG', 20, yOffset, 170, 85);
-                
-                yOffset += 90;
-                
-                if (index === 3) {
-                    // Add damage reports
+            const damageItems = document.querySelectorAll('.damage-item');
+            let reportYOffset = 25;
+            
+            damageItems.forEach((item, i) => {
+                if (i > 0 && reportYOffset > 250) {
                     doc.addPage();
-                    doc.setFontSize(16);
-                    doc.text('Inspection Reports', 105, 15, null, null, 'center');
-                    
-                    const damageItems = document.querySelectorAll('.damage-item');
-                    let reportYOffset = 25;
-                    
-                    damageItems.forEach((item, i) => {
-                        if (i > 0 && reportYOffset > 250) {
-                            doc.addPage();
-                            reportYOffset = 15;
-                        }
-                        
-                        doc.setFontSize(12);
-                        doc.text(item.innerText, 20, reportYOffset);
-                        reportYOffset += 40;
-                    });
+                    reportYOffset = 15;
                 }
                 
-                viewElement.style.display = index === 1 ? 'block' : 'none';
+                doc.setFontSize(12);
+                doc.text(item.innerText, 20, reportYOffset);
+                reportYOffset += 40;
             });
-        });
-
-        return doc;
+        }
     }
 
-    exportPdfBtn.addEventListener('click', function() {
-        const doc = generatePDF();
-        doc.save('box_truck_inspection_report.pdf');
-    });
+    return doc;
+}
+
+    exportPdfBtn.addEventListener('click', async function() {
+    const doc = await generatePDF();
+    doc.save('box_truck_inspection_report.pdf');
+});
 
     shareEmailBtn.addEventListener('click', function() {
         emailModal.style.display = "block";
