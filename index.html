@@ -567,46 +567,19 @@
         document.getElementById('damage-location').value = '';
     }
 
-    function exportToPdf() {
-            const doc = new jsPDF();
-            const datetime = document.getElementById('inspection-datetime').value;
-            const damageStatus = document.querySelector('input[name="damage-status"]:checked').value;
-            const damageLocation = document.getElementById('damage-location').value;
-            const damageDescription = document.getElementById('damage-description').value;
-            const damageSeverity = document.getElementById('damage-severity').value;
-
-            doc.setFontSize(18);
-            doc.text('Box Truck Inspection Report', 20, 20);
-
-            doc.setFontSize(12);
-            doc.text(`Date and Time of Inspection: ${datetime}`, 20, 40);
-            doc.text(`Damage Status: ${damageStatus}`, 20, 50);
-            if (damageStatus === 'damaged') {
-                doc.text(`Damage Location: ${damageLocation}`, 20, 60);
-                doc.text(`Damage Description: ${damageDescription}`, 20, 70);
-                doc.text(`Damage Severity: ${damageSeverity}`, 20, 80);
-            }
-
-            const reports = getDamageReports();
-            let yOffset = 90;
-            reports.forEach(report => {
-                doc.text(`Inspection Report at ${report.datetime}`, 20, yOffset);
-                yOffset += 10;
-                doc.text(`Status: ${report.status}`, 20, yOffset);
-                yOffset += 10;
-                if (report.status === 'damaged') {
-                    doc.text(`Location: ${report.location}`, 20, yOffset);
-                    yOffset += 10;
-                    doc.text(`Description: ${report.description}`, 20, yOffset);
-                    yOffset += 10;
-                    doc.text(`Severity: ${report.severity}`, 20, yOffset);
-                    yOffset += 10;
-                }
-                yOffset += 10;
-            });
-
-            doc.save('inspection-report.pdf');
-        }
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(18);
+        doc.text('Box Truck Inspection Report', 105, 15, null, null, 'center');
+        
+        // Add date
+        doc.setFontSize(12);
+        doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 25);
+        
+        let yOffset = 35;
         
         // Add truck diagrams
         ['front-view', 'passenger-side-view', 'driver-side-view', 'back-view'].forEach((view, index) => {
